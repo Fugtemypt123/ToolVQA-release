@@ -1,0 +1,1 @@
+OCR_PROMPT = """The image contains some text. We can use OCR to extract the text from the image."""

@@ -1,0 +1,1 @@
+MATHOCR_PROMPT = """The image contains a mathematical expression. We can use MathOCR to extract the expression from the image."""

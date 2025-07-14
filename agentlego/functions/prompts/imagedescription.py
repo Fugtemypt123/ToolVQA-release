@@ -1,0 +1,1 @@
+IMAGEDESCRIPTION_PROMPT = """Since we don't know the information in the picture, we first call tool ImageDescription to describe the picture."""
