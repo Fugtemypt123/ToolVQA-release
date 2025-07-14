@@ -140,7 +140,7 @@ cd agentlego
 source setup.sh 
 # This step includes an export proxy=8890 operation. If the corresponding clash is not opened, an error will be reported.
 
-agentlego-server start --port 16181 --extra ./benchmarkupd.py  `cat benchmark_toollist.txt` --host 0.0.0.0 
+agentlego-server start --port 16181 --extra ./custom_tools.py  `cat toollist.txt` --host 0.0.0.0 
 # --port can specify any port, but the corresponding port must be changed in eval_config later.
 # The deployment of this api will occupy about 2G memory, but for unknown reasons, the memory usage will gradually increase during testing, so it is best to reserve about 6G.
 ```
