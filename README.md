@@ -9,7 +9,7 @@ In this work, we introduce **ToolVQA**, a large-scale multimodal dataset compris
 To construct this dataset, we propose ToolEngine, a novel data generation pipeline that employs Depth-First Search (DFS) with a dynamic in-context example matching mechanism to simulate human-like tool-use reasoning. ToolVQA encompasses 10 multimodal tools across 7 diverse task domains, with an average inference length of 2.78 reasoning steps per instance.  
 
 <div align="center">
- <img src="figs/new_teaser.png" width="800"/>
+ <img src="figs/new_teaser.jpg" width="800"/>
 </div>
 
 The fine-tuned 7B LFMs on ToolVQA not only achieve impressive performance on our test set but also surpass the large close-sourced model GPT-3.5-turbo on various out-of-distribution (OOD) datasets, demonstrating strong generalizability to real-world tool-use scenarios.
