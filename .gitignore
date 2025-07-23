@@ -2,9 +2,7 @@ __pycache__/
 ckpt/
 datasets/
 human_annotation/
-*data/
 *.zip
-*.json
 *output/
 *outputs/
 analysis/
@@ -15,6 +13,4 @@ generated_data/
 _not_used/
 previous/
 
-data/test
-data/train
 work_dirs

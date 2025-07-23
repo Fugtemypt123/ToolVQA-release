@@ -41,9 +41,22 @@ You can download the dataset from [Google Drive](https://drive.google.com/drive/
 
 There are three files in our dataset:
 
-1. `toolvqa_imgs.zip`: 23655(21105+2550) images, each image corresponds to an instance of ToolVQA. Please put these images under directory `datasets/ToolVQA/`.
-2. `raw_train_21105.json`: 21105 training instances.
-3. `raw_test_2550.json`: 2550 test instances.
+#### 1. `toolvqa_imgs.zip`: 
+23655(21105+2550) images, each image corresponds to an instance of ToolVQA. 
+Please put these images under directory `datasets/ToolVQA/`.
+
+#### 2. `raw_train_21105.json`: 
+21105 training instances. For training, please:
+1. put the data under `xtuner/data/train/`.
+2. refer to `xtuner/data/train/example.json` to format the data.
+3. modify the file name in `xtuner/llava.py` to your file name.
+
+#### 3. `raw_test_2550.json`: 
+2550 test instances. For test, please:
+1. refer to `opencompass/data/ToolVQA/dataset.json` to format the data.
+2. put the data under `opencompass/data/ToolVQA/dataset.json`, do NOT change the file name. 
+
+You should have `dataset.json` and `toolmeta.json` under `opencompass/data/ToolVQA/` for test.
    
 Each instance is in the format of:
 ```python

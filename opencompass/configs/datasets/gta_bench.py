@@ -29,7 +29,7 @@ gta_bench_datasets = [
     dict(
         abbr="gta_bench",
         type=GTABenchDataset,
-        path="data/gta_dataset",
+        path="data/ToolVQA",
         reader_cfg=gta_bench_reader_cfg,
         infer_cfg=gta_bench_infer_cfg,
         eval_cfg=gta_bench_eval_cfg,
