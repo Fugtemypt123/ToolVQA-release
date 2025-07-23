@@ -155,7 +155,7 @@ python convert_xtuner_weights_to_hf.py --text_model_id path/to/xtuner_model/llm_
 xtuner train llava.py --deepspeed deepspeed_zero2
 ```
 
-If your environment does not support deepspeed, just remove it.
+If your environment does not support deepspeed, just remove `--deepspeed deepspeed_zero2`.
 
 For any question, please refer to [https://xtuner.readthedocs.io/zh-cn/latest/training/multi_modal_dataset.html](https://xtuner.readthedocs.io/zh-cn/latest/training/multi_modal_dataset.html).
 
