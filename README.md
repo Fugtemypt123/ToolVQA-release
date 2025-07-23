@@ -139,15 +139,31 @@ This section requires `xtuner` environment.
 
 (1) Download the checkpoint [Tuned LLaVA](https://drive.google.com/file/d/1QBoaSQGmLDpcbdX2jnYmcTWIpu1gY6Dv/view?usp=sharing).
 
-(2) Download [LLaMA-3-8b-Instruct](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) on huggingface.
+(2) Download [LLaMA-3-8b-Instruct](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) and [CLIP backbone](https://huggingface.co/openai/clip-vit-large-patch14-336) on huggingface.
 
 (3) Run 
 
 ```bash
 cd xtuner
-xtuner convert merge path/to/models--meta-llama--Meta-Llama-3-8B-Instruct path/to/xtuner_model/llm_adapter path/to/llm_merge --safe-serialization
-python convert_xtuner_weights_to_hf.py --text_model_id path/to/xtuner_model/llm_merge --vision_model_id path/to/models--openai--clip-vit-large-patch14-336 --projector_weight path/to/xtuner_model/projector/model.safetensors --save_path path/to/xtuner_model/llava_finetune
+
+xtuner convert merge \
+    path/to/llama-model \
+    path/to/iter_xxxx_hf/llm_adapter \
+    path/to/output/llm_merge \
+    --safe-serialization
+
+python convert_xtuner_weights_to_hf.py \
+    --text_model_id path/to/output/llm_merge \
+    --vision_model_id path/to/clip-model \
+    --projector_weight path/to/iter_xxxx_hf/projector/model.safetensors \
+    --save_path path/to/output/llava_finetune
 ```
+
+In which:
+
+1. `path/to/llama-model` and `path/to/clip-model` refer to the `Meta-Llama-3-8B-Instruct` and `clip-vit-large-patch14-336` model paths you just download from huggingface.
+2. `path/to/iter_xxxx_hf/llm_adapter` and `path/to/iter_xxxx_hf/projector/model.safetensors` are in the checkpoint you download.
+3. `path/to/output/llm_merge` and `path/to/output/llava_finetune` are the custom paths to output your merged models. The `path/to/output/llava_finetune` can be used as a huggingface-formatted VLM.
 
 #### 2. To fine-tune your model, run:
 
