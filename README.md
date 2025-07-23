@@ -135,6 +135,8 @@ python build_any.py
 
 This section requires `xtuner` environment.
 
+#### 1. To reproduce the number in the paper:
+
 (1) Download the checkpoint [Tuned LLaVA](https://drive.google.com/file/d/1QBoaSQGmLDpcbdX2jnYmcTWIpu1gY6Dv/view?usp=sharing).
 
 (2) Download [LLaMA-3-8b-Instruct](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) on huggingface.
@@ -142,10 +144,18 @@ This section requires `xtuner` environment.
 (3) Run 
 
 ```bash
-xtuner convert merge path/to/models--meta-llama--Meta-Llama-3-8B-Instruct path/to/xtuner_model/llm_adapter path/to/llm_merge --safe-serialization
 cd xtuner
+xtuner convert merge path/to/models--meta-llama--Meta-Llama-3-8B-Instruct path/to/xtuner_model/llm_adapter path/to/llm_merge --safe-serialization
 python convert_xtuner_weights_to_hf.py --text_model_id path/to/xtuner_model/llm_merge --vision_model_id path/to/models--openai--clip-vit-large-patch14-336 --projector_weight path/to/xtuner_model/projector/model.safetensors --save_path path/to/xtuner_model/llava_finetune
 ```
+
+#### 2. To fine-tune your model, run:
+
+```bash
+xtuner train llava.py --deepspeed deepspeed_zero2
+```
+
+If your environment does not support deepspeed, just remove it.
 
 For any question, please refer to [https://xtuner.readthedocs.io/zh-cn/latest/training/multi_modal_dataset.html](https://xtuner.readthedocs.io/zh-cn/latest/training/multi_modal_dataset.html).
 
