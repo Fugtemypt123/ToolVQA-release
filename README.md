@@ -98,6 +98,8 @@ This part requires `agentlego` environment.
 conda activate agentlego
 export OPENAI_API_KEY='your_openai_api_key'
 export SERPER_API_KEY='your_serper_key_for_google_search_tool' # API for Google Search, register at 'https://serper.dev'
+export MATHPIX_APP_ID="your_mathpix_api_id_for_mathocr_tool" # if not use, just delete this line and this tool in 'toollist.txt'.  
+export MATHPIX_APP_KEY="your_mathpix_api_key_for_mathocr_tool" # if not use, just delete this line and this tool in 'toollist.txt'. 
 cd agentlego
 agentlego-server start --port 16181 --extra ./custom_tools.py  `cat toollist.txt` --host 0.0.0.0
 ```
@@ -135,34 +137,42 @@ python build_any.py
 
 This section requires `xtuner` environment.
 
-#### 1. To reproduce the number in the paper:
+(1) Use `us2gta.py` to transfer `raw_train_21105.json` into GTA format data (To evaluate in opencompass).
 
-(1) Download the checkpoint [Tuned LLaVA](https://drive.google.com/file/d/1QBoaSQGmLDpcbdX2jnYmcTWIpu1gY6Dv/view?usp=sharing).
+(2) Use `gta2xtuner.py` to transfer GTA format data into xtuner format data (To train in xtuner).
 
-(2) Download [LLaMA-3-8b-Instruct](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) on huggingface.
-
-(3) Run 
-
+(3) Run
 ```bash
-cd xtuner
-xtuner convert merge path/to/models--meta-llama--Meta-Llama-3-8B-Instruct path/to/xtuner_model/llm_adapter path/to/llm_merge --safe-serialization
-python convert_xtuner_weights_to_hf.py --text_model_id path/to/xtuner_model/llm_merge --vision_model_id path/to/models--openai--clip-vit-large-patch14-336 --projector_weight path/to/xtuner_model/projector/model.safetensors --save_path path/to/xtuner_model/llava_finetune
-```
-
-#### 2. To fine-tune your model, run:
-
-```bash
-xtuner train llava.py --deepspeed deepspeed_zero2
+NPROC_PER_NODE=4 xtuner train llava.py --deepspeed deepspeed_zero2
 ```
 
 If your environment does not support deepspeed, just remove `--deepspeed deepspeed_zero2`.
 
-For any question, please refer to [https://xtuner.readthedocs.io/zh-cn/latest/training/multi_modal_dataset.html](https://xtuner.readthedocs.io/zh-cn/latest/training/multi_modal_dataset.html).
+(4) When you get the output checkpoint, you should transfer it into the huggingface format. 
+
+To do this, run
+```bash
+cd xtuner
+
+xtuner convert pth_to_hf xtuner/work_dirs/llava_gta/2025xxxx_xxxxxx/vis_data/config.py xtuner/work_dirs/llava_gta/iter_9600.pth xtuner/work_dirs/llava_gta/iter_9600_hf --safe-serialization
+
+xtuner convert merge path/to/models--meta-llama--Meta-Llama-3-8B-Instruct path/to/xtuner_model/llm_adapter path/to/llm_merge --safe-serialization
+
+python convert_xtuner_weights_to_hf.py --text_model_id path/to/xtuner_model/llm_merge --vision_model_id path/to/models--openai--clip-vit-large-patch14-336 --projector_weight path/to/xtuner_model/projector/model.safetensors --save_path path/to/xtuner_model/llava_finetune
+```
+
+You can also download a fine-tuned checkpoint of LLaVA [here](TODO!!!).
+
+In the following section, you should change `path/to/models` to your fine-tuned model path.
+
+
+(5) For any question, please refer to [https://xtuner.readthedocs.io/zh-cn/latest/training/multi_modal_dataset.html](https://xtuner.readthedocs.io/zh-cn/latest/training/multi_modal_dataset.html).
 
 Possible issues: 
 
 1. [The fine-tuned model cannot be converted to huggingface format?](https://github.com/InternLM/xtuner/issues/835)
 2. [The merged model cannot be started?](https://github.com/InternLM/lmdeploy/issues/2036)
+
 
 ### 2.5 Evaluation
 
@@ -202,8 +212,10 @@ conda activate opencompass
 python run.py path/to/your_eval_config -p llmit -q auto --max-num-workers 32 --debug --eval_mode=your_eval_mode
 # args guideline: opencompass/configs/readme.md
 # default output dir: opencompass/outputs/default
-# If the test above is interrupted halfway, you can add --reuse 2024xxxx (the file name of the test output, you can also rename it yourself) to the test command and continue the test.
+
+# If the test above is interrupted halfway, you can add --reuse 2025xxxx_xxxxxx (the file name of the test output, you can also rename it yourself) to the test command and continue the test.
+python run.py path/to/your_eval_config -p llmit -q auto --max-num-workers 32 --debug --eval_mode=your_eval_mode --reuse 2025xxxx_xxxxxx
 
 # want to run the metric again:
-python run.py path/to/your_eval_config --max-num-workers 32 --debug --reuse your_output_name --mode eval --eval_mode=your_eval_mode
+python run.py path/to/your_eval_config --max-num-workers 32 --debug --reuse 2025xxxx_xxxxxx --mode eval --eval_mode=your_eval_mode
 ```

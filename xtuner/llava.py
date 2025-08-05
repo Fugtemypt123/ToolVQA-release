@@ -22,13 +22,13 @@ from xtuner.utils import PROMPT_TEMPLATE
 #                          PART 1  Settings                           #
 #######################################################################
 # Model
-llm_name_or_path = '../ckpt/models/Meta-Llama-3-8B-Instruct'
-visual_encoder_name_or_path = '../ckpt/models/clip-vit-large-patch14-336'
+llm_name_or_path = '/network_space/server126/shared/yinshaofeng/ToolLLM/GTA/ckpt/models/Meta-Llama-3-8B-Instruct'
+visual_encoder_name_or_path = '/network_space/server126/shared/yinshaofeng/ToolLLM/GTA/ckpt/models/clip-vit-large-patch14-336'
 # Specify the pretrained pth
-pretrained_pth = '../ckpt/models/llava-llama-3-8b-v1_1-pth/model.pth'  # noqa: E501
+pretrained_pth = '/network_space/server127/shared/yinshaofeng/models/llava-llama-3-8b-v1_1-pth/model.pth'  # noqa: E501
 
 # Data
-data_root = 'data/'
+data_root = '/network_space/server126/shared/yinshaofeng/ToolLLM/GTA/xtuner/data/'
 data_path = data_root + 'train/train_data_vlm_21105.json'
 image_folder = ''
 prompt_template = PROMPT_TEMPLATE.llama3_chat
@@ -38,9 +38,9 @@ max_length = int(3072 - (336 / 14)**2) # int(2048 - (336 / 14)**2)
 batch_size = 2  # per_device
 accumulative_counts = 128
 dataloader_num_workers = 0
-max_epochs = 75
+max_epochs = 2
 optim_type = AdamW
-lr = 1e-4
+lr = 2e-4
 betas = (0.9, 0.999)
 weight_decay = 0
 max_norm = 1  # grad clip
@@ -51,10 +51,12 @@ save_steps = 1000
 save_total_limit = 10  # Maximum checkpoints to keep (-1 means unlimited)
 
 # Evaluate the generation performance during the training
-evaluation_freq = 1000
+evaluation_freq = 5000
 SYSTEM = ''
-evaluation_images = 'https://llava-vl.github.io/static/images/view.jpg'
-evaluation_inputs = ['请描述一下这张照片', 'Please describe this picture']
+# evaluation_images = 'https://llava-vl.github.io/static/images/view.jpg'
+# evaluation_inputs = ['请描述一下这张照片', 'Please describe this picture']
+evaluation_images = '/network_space/server126/shared/yinshaofeng/ToolLLM/GTA/xtuner/data/test/test_data_vlm_50.json'
+evaluation_inputs = '/network_space/server126/shared/yinshaofeng/ToolLLM/GTA/xtuner/data/test/test_data_vlm_50.json'
 
 #######################################################################
 #            PART 2  Model & Tokenizer & Image Processor              #
@@ -213,7 +215,7 @@ visualizer = None
 log_level = 'INFO'
 
 # load from which checkpoint
-load_from = 'work_dirs/llava_21105/20250303_063620/iter_4000.pth'
+load_from = None
 
 # whether to resume training from the loaded checkpoint
 resume = False

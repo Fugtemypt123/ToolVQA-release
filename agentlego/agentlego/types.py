@@ -94,7 +94,7 @@ class File(IOType):
 
 
 class ImageIO(IOType):
-    support_types = {'path': str, 'pil': str, 'array': np.ndarray}
+    support_types = {'path': str, 'pil': Image.Image, 'array': np.ndarray}
 
     def __init__(self, value: Union[str, np.ndarray, Image.Image]):
         super().__init__(value)
@@ -111,14 +111,13 @@ class ImageIO(IOType):
         return self.to('array')
 
     def to_file(self) -> IOBase:
-        return self.value
-        # if self.type == 'path':
-        #     return open(self.value, 'rb')
-        # else:
-        #     file = BytesIO()
-        #     self.to_pil().save(file, 'PNG')
-        #     file.seek(0)
-        #     return file
+        if self.type == 'path':
+            return open(self.value, 'rb')
+        else:
+            file = BytesIO()
+            self.to_pil().save(file, 'PNG')
+            file.seek(0)
+            return file
 
     @classmethod
     def from_file(cls, file: IOBase) -> 'ImageIO':
@@ -127,16 +126,16 @@ class ImageIO(IOType):
 
     @staticmethod
     def _path_to_pil(path: str) -> Image.Image:
-        return path # Image.open(path)
+        return Image.open(path)
 
     @staticmethod
     def _path_to_array(path: str) -> np.ndarray:
-        return path # np.array(Image.open(path).convert('RGB'))
+        return np.array(Image.open(path).convert('RGB'))
 
     @staticmethod
     def _pil_to_path(image: Image.Image) -> str:
         filename = temp_path('image', '.png')
-        # image.save(filename)
+        image.save(filename)
         return filename
 
     @staticmethod
@@ -150,7 +149,7 @@ class ImageIO(IOType):
     @staticmethod
     def _array_to_path(image: np.ndarray) -> str:
         filename = temp_path('image', '.png')
-        # Image.fromarray(image).save(filename)
+        Image.fromarray(image).save(filename)
         return filename
 
 

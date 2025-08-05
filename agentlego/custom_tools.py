@@ -10,13 +10,6 @@ import re
 from io import BytesIO
 from paddleocr import PaddleOCR
 from functions.gpt import get_completion_visual, get_completion
-import json
-
-import os
-API_KEY = os.getenv('OPENAI_API_KEY')
-
-with open('pretool_ours.json', 'r') as f:
-    image_tool_results = json.load(f)
 
 class ImageDescription(BaseTool):
     default_desc = ('A useful tool that returns a brief '
@@ -24,7 +17,7 @@ class ImageDescription(BaseTool):
 
     def __init__(self,
                  model='gpt-4o',
-                 api_key=API_KEY,
+                 api_key="none",
                  base_url="https://29qg.com/v1",
                  toolmeta=None):
         super().__init__(toolmeta=toolmeta)
@@ -56,13 +49,12 @@ class ImageDescription(BaseTool):
     #     )
     #     return response.choices[0].message.content
 
-    def apply(self, image: str) -> str:
-        print("image", image)
-        image_path = image_tool_results[image]
-        if 'ImageDescription' in image_path:
-            return image_path['ImageDescription']
-        else:
-            return 'Error: No image description found'
+    def apply(self, image: ImageIO) -> str:
+        image = image.value
+        with BytesIO() as buffered:
+            image.save(buffered, format="WEBP")
+            image = base64.b64encode(buffered.getvalue()).decode("utf-8")
+        return get_completion_visual('Describe the image briefly', image)
 
 
 class CountGivenObject(BaseTool):
@@ -70,7 +62,7 @@ class CountGivenObject(BaseTool):
 
     def __init__(self,
                  model='gpt-4o',
-                 api_key=API_KEY,
+                 api_key="none",
                  base_url="https://29qg.com/v1",
                  toolmeta=None):
         super().__init__(toolmeta=toolmeta)
@@ -104,16 +96,25 @@ class CountGivenObject(BaseTool):
 
     def apply(
         self,
-        image: str,
+        image: ImageIO,
         text: Annotated[str, Info('The object description in English.')],
         bbox: Annotated[Optional[str],
                         Info('The bbox coordinate in the format of `(x1, y1, x2, y2)`')] = None,
     ) -> int:
-        image_path = image_tool_results[image]
-        if 'CountGivenObject' in image_path:
-            return image_path['CountGivenObject']
+        image = image.value
+        if bbox is not None:
+            from agentlego.utils import parse_multi_float
+            x1, y1, x2, y2 = (int(item) for item in parse_multi_float(bbox))
+            image = image.crop((x1, y1, x2, y2))
+        with BytesIO() as buffered:
+            image.save(buffered, format="WEBP")
+            image = base64.b64encode(buffered.getvalue()).decode("utf-8")
+        res = get_completion_visual(f'How many main {text} are in the image? Reply a digit', image)
+        res = re.findall(r'\d+', res)
+        if len(res) > 0:
+            return int(res[0])
         else:
-            return 'Error: No object count found'
+            return 0
 
 
 class RegionAttributeDescription(BaseTool):
@@ -121,7 +122,7 @@ class RegionAttributeDescription(BaseTool):
 
     def __init__(self,
                  model='gpt-4o',
-                 api_key=API_KEY,
+                 api_key="none",
                  base_url="https://29qg.com/v1",
                  toolmeta=None):
         super().__init__(toolmeta=toolmeta)
@@ -155,16 +156,18 @@ class RegionAttributeDescription(BaseTool):
 
     def apply(
         self,
-        image: str,
+        image: ImageIO,
         bbox: Annotated[str,
                         Info('The bbox coordinate in the format of `(x1, y1, x2, y2)`')],
         attribute: Annotated[str, Info('The attribute to describe')],
     ) -> str:
-        image_path = image_tool_results[image]
-        if 'RegionAttributeDescription' in image_path:
-            return image_path['RegionAttributeDescription']
-        else:
-            return 'Error: No region attribute description found'
+        image = image.value     
+        x1, y1, x2, y2 = (int(item) for item in parse_multi_float(bbox))
+        image = image.crop((x1, y1, x2, y2))
+        with BytesIO() as buffered:
+            image.save(buffered, format="WEBP")
+            image = base64.b64encode(buffered.getvalue()).decode("utf-8")
+        return get_completion_visual(f'Describe {attribute} on the image briefly', image)
 
 
 # TODO: split question-ocr(gpt-4) and answer-ocr(paddleocr)
@@ -188,7 +191,7 @@ class OCR(BaseTool):
 
     def __init__(self,
                  model='gpt-4o',
-                 api_key=API_KEY,
+                 api_key="none",
                  base_url="https://29qg.com/v1",
                  toolmeta=None):
         super().__init__(toolmeta=toolmeta)
@@ -221,7 +224,11 @@ class OCR(BaseTool):
     #     )
     #     return response.choices[0].message.content
 
-    def apply(self, image: str, lang: str='en') -> str:
+    def setup(self):
+        self.ocrmodel['en'] = PaddleOCR(use_angle_cls=False, lang="en", show_log=False)
+        self.ocrmodel['ch'] = PaddleOCR(use_angle_cls=False, lang="ch", show_log=False)
+
+    def apply(self, image: ImageIO, lang: str='en') -> str:
         '''
         args:
             image: PIL image
@@ -229,51 +236,37 @@ class OCR(BaseTool):
             result: list of item
             item: {"text": text, "conf": confidence, "bbox": (x0, y0, x1, y1)}
         '''
-        image_path = image_tool_results[image]
-        if 'OCR' in image_path:
-            return image_path['OCR']
-        else:
-            return 'Error: No OCR result found'
+        if lang == 'qs':
+            image = image.value
+            with BytesIO() as buffered:
+                image.save(buffered, format="WEBP")
+                image = base64.b64encode(buffered.getvalue()).decode("utf-8")
+            return get_completion_visual('Recognize the text and the number in the image.', image)
         
-class TextToBbox(BaseTool):
-    """A tool to detection the given object.
+        if lang == 'eng':
+            lang = 'en'
 
-    Args:
-        model (str): The model name used to detect texts.
-            Which can be found in the ``MMDetection`` repository.
-            Defaults to ``glip_atss_swin-t_a_fpn_dyhead_pretrain_obj365``.
-        device (str): The device to load the model. Defaults to 'cpu'.
-        toolmeta (None | dict | ToolMeta): The additional info of the tool.
-            Defaults to None.
-    """
-
-    default_desc = ('The tool can detect the object location according to '
-                    'description.')
-
-    def __init__(self,
-                 model: str = 'glip_atss_swin-l_fpn_dyhead_pretrain_mixeddata',
-                 device: str = 'cuda',
-                 toolmeta=None):
-        super().__init__(toolmeta=toolmeta)
-        self.model = model
-        self.device = device
-
-    def apply(
-        self,
-        image: str,
-        text: Annotated[str, Info('The object description in English.')],
-        top1: Annotated[bool,
-                        Info('If true, return the object with highest score. '
-                             'If false, return all detected objects.')] = True,
-    ) -> Annotated[str,
-                   Info('Detected objects, include bbox in '
-                        '(x1, y1, x2, y2) format, and detection score.')]:
-        image_path = image_tool_results[image]
-        if 'TextToBbox' in image_path:
-            return image_path['TextToBbox']
-        else:
-            return 'Error: No text to bbox result found'
-
+        image = image.to_array()
+        result = self.ocrmodel[lang].ocr(image, cls=False)[0]
+        
+        items = []
+        if result == None:
+            return items
+        for line in result:
+            x0, y0 = image.shape[:2]
+            x1, y1 = 0, 0
+            for point in line[0]:
+                x0 = min(x0, point[0])
+                y0 = min(y0, point[1])
+                x1 = max(x1, point[0])
+                y1 = max(y1, point[1])
+            items.append('({}, {}, {}, {}) {}'.format(int(x0), int(y0), int(x1), int(y1), line[1][0]))
+            # items.append([int(x0), int(y0), int(x1), int(y1), line[1][0]])
+        # items = sorted(items, key=lambda x: x[1])
+        # for i in range(len(items)):
+        #     items[i] = '({}, {}, {}, {}) {}'.format(items[i][0], items[i][1], items[i][2], items[i][3], items[i][4])
+        items = '\n'.join(items)
+        return items
         
 
 # class ImageStylization(BaseTool):
@@ -308,7 +301,7 @@ class TextToBbox(BaseTool):
 #     def setup(self):
 #         pass
 
-#     def apply(self, image: str, instruction: str) -> str:
+#     def apply(self, image: ImageIO, instruction: str) -> ImageIO:
 #         return 'image/output.png'
     
 #     def __call__(self, *args: Any, **kwargs) -> Any:
@@ -350,7 +343,7 @@ class TextToBbox(BaseTool):
 #         self,
 #         keywords: Annotated[str,
 #                             Info('A series of keywords separated by comma.')],
-#     ) -> str:
+#     ) -> ImageIO:
 #         return 'image/output.png'
 
 #     def __call__(self, *args: Any, **kwargs) -> Any:
@@ -362,12 +355,12 @@ class TextToBbox(BaseTool):
 
 #     def apply(
 #         self,
-#         image: str,
+#         image: ImageIO,
 #         bbox: Annotated[str,
 #                         Info('The bbox coordinate in the format of `(x1, y1, x2, y2)`')],
 #         annotation: Annotated[Optional[str],
 #                               Info('The extra annotation text of the bbox')] = None,
-#     ) -> str:
+#     ) -> ImageIO:
 #         return 'image/output.png'
     
 #     def __call__(self, *args: Any, **kwargs) -> Any:
@@ -379,7 +372,7 @@ class TextToBbox(BaseTool):
 
 #     def apply(
 #         self,
-#         image: str,
+#         image: ImageIO,
 #         text: str,
 #         position: Annotated[
 #             str,
@@ -387,7 +380,7 @@ class TextToBbox(BaseTool):
 #                  'or a combination of ["l"(left), "m"(middle), "r"(right)] '
 #                  'and ["t"(top), "m"(middle), "b"(bottom)] like "mt" for middle-top')],
 #         color: str = 'red',
-#     ) -> str:
+#     ) -> ImageIO:
 #         return 'image/output.png'
 
 #     def __call__(self, *args: Any, **kwargs) -> Any:
@@ -440,7 +433,7 @@ class TextToBbox(BaseTool):
 
 #     def apply(
 #         self,
-#         image: str,
+#         image: ImageIO,
 #     ) -> Annotated[str,
 #                    Info('OCR results, include bbox in x1, y1, x2, y2 format '
 #                         'and the recognized text.')]:
@@ -508,7 +501,7 @@ class TextToBbox(BaseTool):
 
 #     def __init__(self,
 #                  model='gpt-4o',
-#                  api_key="xxx",
+#                  api_key=,
 #                  base_url="https://29qg.com/v1",
 #                  toolmeta=None):
 #         super().__init__(toolmeta=toolmeta)
@@ -540,7 +533,7 @@ class TextToBbox(BaseTool):
 #         )
 #         return response.choices[0].message.content
 
-#     def apply(self, image: str) -> str:
+#     def apply(self, image: ImageIO) -> str:
 #         image = image.value
 #         with BytesIO() as buffered:
 #             image.save(buffered, format="WEBP")
@@ -590,7 +583,7 @@ class TextToBbox(BaseTool):
 
 #     def apply(
 #         self,
-#         image: str,
+#         image: ImageIO,
 #     ) -> Annotated[str,
 #                    Info('OCR results, include bbox in x1, y1, x2, y2 format '
 #                         'and the recognized text.')]:
@@ -638,3 +631,4 @@ class TextToBbox(BaseTool):
 #         xs = [int(box[0]) for box in char_boxes]
 #         ys = [int(box[1]) for box in char_boxes]
 #         return min(xs), min(ys), max(xs), max(ys)
+

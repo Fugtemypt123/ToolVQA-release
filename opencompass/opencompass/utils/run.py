@@ -7,11 +7,11 @@ import tabulate
 from mmengine.config import Config
 
 from opencompass.datasets.custom import make_custom_dataset_config
-from opencompass.models._not_used import (VLLM, HuggingFace, HuggingFaceBaseModel,
-                                HuggingFaceCausalLM, HuggingFaceChatGLM3,
-                                HuggingFacewithChatTemplate, TurboMindModel,
-                                TurboMindModelwithChatTemplate,
-                                VLLMwithChatTemplate)
+# from opencompass.models._not_used import (VLLM, HuggingFace, HuggingFaceBaseModel,
+#                                 HuggingFaceCausalLM, HuggingFaceChatGLM3,
+#                                 HuggingFacewithChatTemplate, TurboMindModel,
+#                                 TurboMindModelwithChatTemplate,
+#                                 VLLMwithChatTemplate)
 from opencompass.partitioners import NaivePartitioner, NumWorkerPartitioner
 from opencompass.runners import DLCRunner, LocalRunner, SlurmRunner
 from opencompass.tasks import OpenICLEvalTask, OpenICLInferTask

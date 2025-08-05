@@ -9,9 +9,8 @@ from opencompass.tasks import OpenICLInferTask
 
 with read_base():
     from .datasets.gta_bench import gta_bench_datasets as datasets
-
-import os
-api_key = os.getenv('OPENAI_API_KEY')
+    
+api_key = "your_api_key_here"
 
 models = {
     'llava-ft-4000-ablation-singlehop_vlm': dict(
@@ -119,7 +118,7 @@ models = {
             stop='<|im_end|>',
         ),
         tool_server='http://222.29.51.126:16181', # end-to-end
-        # tool_meta='data/gta_dataset/toolmeta.json',
+        # tool_meta='data/ToolVQA/toolmeta.json',
         batch_size=8,
     ),
     'llava-llama-3-8b-v1_1-transformers_vlm': dict(
@@ -330,15 +329,15 @@ models = {
         max_turn=6,
         llm=dict(
             type=OpenAIVisual,
-            path='llava-ft-4000',
+            path='llama',
             key='EMPTY', # put your key here
-            openai_api_base='http://222.29.51.128:12586/v1',
+            openai_api_base='http://222.29.51.126:12582/v1',
             query_per_second=1,
             max_seq_len=3072,
             stop='<|eot_id|>',
         ),
         tool_server='http://222.29.51.126:16181', # end-to-end
-        # tool_meta='data/gta_dataset/toolmeta.json',
+        # tool_meta='data/ToolVQA/toolmeta.json',
         batch_size=8,
     ),
     'llava-ft-100_vlm_tool': dict(

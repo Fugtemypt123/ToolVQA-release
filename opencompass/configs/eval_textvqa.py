@@ -78,14 +78,15 @@ models = {
         max_turn=4,
         llm=dict(
             type=OpenAIVisual,
-            path='llava-ft-4000',
+            path='llama',
             key='EMPTY', # put your key here
-            openai_api_base='http://222.29.51.126:12581/v1',
+            openai_api_base='http://222.29.51.126:12582/v1',
             query_per_second=1,
             max_seq_len=3072,
             stop='<|eot_id|>',
         ),
         tool_server='http://222.29.51.126:16181', # end-to-end
+        tool_meta='data/gta_dataset/toolmeta.json',
         batch_size=8,
     ),
 

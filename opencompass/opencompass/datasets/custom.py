@@ -6,8 +6,8 @@ from typing import List
 
 from datasets import Dataset
 
-from opencompass.datasets._not_used.circular import (CircularDatasetMeta,
-                                           CircularEvaluator)
+# from opencompass.datasets._not_used.circular import (CircularDatasetMeta,
+                                        #    CircularEvaluator)
 from opencompass.openicl.icl_evaluator import AccEvaluator, BaseEvaluator
 from opencompass.openicl.icl_inferencer import GenInferencer, PPLInferencer
 from opencompass.openicl.icl_prompt_template import PromptTemplate
@@ -179,8 +179,8 @@ class CustomDataset(BaseDataset):
         return Dataset.from_list(data)
 
 
-class CircularCustomDataset(CustomDataset, metaclass=CircularDatasetMeta):
-    dataset_class = CustomDataset
+# class CircularCustomDataset(CustomDataset, metaclass=CircularDatasetMeta):
+#     dataset_class = CustomDataset
 
 
 def stringfy_types(obj):

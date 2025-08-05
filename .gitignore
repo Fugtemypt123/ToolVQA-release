@@ -1,6 +1,7 @@
 __pycache__/
 ckpt/
 datasets/
+data/
 human_annotation/
 *.zip
 *output/
@@ -8,9 +9,12 @@ human_annotation/
 analysis/
 
 generated_data/
+generated/
 .dev_scripts
 .github
 _not_used/
 previous/
+setup.sh
 
 work_dirs
+~/

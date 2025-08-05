@@ -4,11 +4,13 @@ from openai import OpenAI
 from PIL import Image
 import base64
 from io import BytesIO
+
 import os
-api_key = os.getenv("OPENAI_API_KEY")
+
+api_key = os.environ.get("OPENAI_API_KEY")
+
 
 client = OpenAI(
-  # api_key="sb-01de4de571ca283e762722fe1fe5e4a07309338b8004f6c5",
   api_key=api_key,
   # base_url = 'https://api.openai-sb.com/v1'
   base_url="https://29qg.com/v1"
@@ -23,7 +25,7 @@ client = OpenAI(
 #     )
 #     return response.choices[0].message.content
 
-def get_completion(prompt, model="chatgpt-4o-latest", temperature=0.5):
+def get_completion(prompt, model="gpt-4o", temperature=0.5):
     messages=[
         {
             "role": "user",
@@ -40,7 +42,7 @@ def get_completion(prompt, model="chatgpt-4o-latest", temperature=0.5):
     )
     return response.choices[0].message.content
 
-def get_completion_visual(prompt, image, model="chatgpt-4o-latest"):
+def get_completion_visual(prompt, image, model="gpt-4o"):
     messages=[
         {
             "role": "user",
@@ -63,20 +65,20 @@ def get_completion_visual(prompt, image, model="chatgpt-4o-latest"):
     return response.choices[0].message.content
 
 if __name__ == "__main__":
-    prompt = "Does the wine in this image seem to have an AOP certification from Bordeaux?"
-    with Image.open("/network_space/server126/shared/yinshaofeng/ToolLLM/GTA/datasets/MTWI/image_train/TB1lHpnLXXXXXbwapXXunYpLFXX.jpg") as img:
-        img.thumbnail((800, 800))
-        if img.mode == 'P' or img.mode == 'RGBA':
-            img = img.convert('RGB')
-        buffered = BytesIO()
-        img.save(buffered, format="jpeg")  # 将图片保存到字节流
-        image = base64.b64encode(buffered.getvalue()).decode("utf-8")
+    # prompt = "Does the wine in this image seem to have an AOP certification from Bordeaux?"
+    # with Image.open("/network_space/server126/shared/yinshaofeng/ToolLLM/GTA/datasets/MTWI/image_train/TB1lHpnLXXXXXbwapXXunYpLFXX.jpg") as img:
+    #     img.thumbnail((800, 800))
+    #     if img.mode == 'P' or img.mode == 'RGBA':
+    #         img = img.convert('RGB')
+    #     buffered = BytesIO()
+    #     img.save(buffered, format="jpeg")  # 将图片保存到字节流
+    #     image = base64.b64encode(buffered.getvalue()).decode("utf-8")
 
-    # with open(query_image_path, "rb") as f:
-        #     image = base64.b64encode(f.read()).decode("utf-8")
-    # image = Image.open("/network_space/server126/shared/yinshaofeng/ToolLLM/GTA/agentlego/examples/demo.png")
-    print(get_completion_visual(prompt, image, model='claude-3-5-sonnet-20240620'))
-    # print(get_completion("你好！"))
+    # # with open(query_image_path, "rb") as f:
+    #     #     image = base64.b64encode(f.read()).decode("utf-8")
+    # # image = Image.open("/network_space/server126/shared/yinshaofeng/ToolLLM/GTA/agentlego/examples/demo.png")
+    # print(get_completion_visual(prompt, image, model='claude-3-5-sonnet-20240620'))
+    print(get_completion("你好！"))
 
 
 # version < 1.0.0
