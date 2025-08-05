@@ -1,6 +1,7 @@
 __pycache__/
 ckpt/
-datasets/
+datasets
+_datasets
 data/
 human_annotation/
 *.zip
