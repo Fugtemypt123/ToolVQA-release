@@ -1,5 +1,9 @@
 # ToolVQA: A Dataset for Real-World VQA with External Tools
 
+<p align="center">
+    <a href='https://fugtemypt123.github.io/ToolVQA-website/'><img src='https://img.shields.io/badge/Project-Page-Green'></a>
+    <a href='https://arxiv.org/abs/2508.03284'><img src='https://img.shields.io/badge/HCoG-Arxiv-red'></a>
+</p>
 
 ## 1. Introduction 📣 
 
