@@ -12,8 +12,12 @@
 
 >Integrating external tools into Large Foundation Models (LFMs) has emerged as a promising approach to enhance their problem-solving capabilities. While existing studies have demonstrated strong performance in tool-augmented Visual Question Answering (VQA), recent benchmarks reveal significant gaps in real-world tool-use proficiency, particularly in functionally diverse multimodal settings requiring multi-step reasoning.  
 
-In this work, we introduce **ToolVQA**, a large-scale multimodal dataset comprising **23K** instances, designed to bridge this gap. Unlike previous datasets that rely on synthetic scenarios and simplified queries, ToolVQA features real-world visual contexts and challenging implicit multi-step reasoning tasks, better aligning with real user interactions.
-To construct this dataset, we propose ToolEngine, a novel data generation pipeline that employs Depth-First Search (DFS) with a dynamic in-context example matching mechanism to simulate human-like tool-use reasoning. ToolVQA encompasses 10 multimodal tools across 7 diverse task domains, with an average inference length of 2.78 reasoning steps per instance.  
+In this work, we introduce ToolVQA, a large-scale multimodal dataset comprising 23K samples, designed to bridge this gap. Unlike previous datasets that rely on synthetic scenarios and simplified queries, ToolVQA features real-world visual contexts and challenging implicit multi-step reasoning tasks, better aligning with real user interactions.
+
+To construct this dataset, we propose ToolEngine, a novel data generation pipeline that employs image-guided Depth-First Search (DFS) with a Longest Common Subsequence (LCS)-based example matching mechanism to simulate human-like tool-use reasoning. 
+ToolVQA encompasses 10 multimodal tools across 7 diverse domains, with an average inference length of 2.78 reasoning steps per sample.  
+
+The LLaVA-7B model fine-tuned on ToolVQA not only achieves impressive performance on the ToolVQA test set, but also surpasses the large closed-source model GPT-3.5-turbo on five out-of-distribution (OOD) datasets, showing strong generalizability in real-world tool-use scenarios.
 
 <div align="center">
  <img src="figs/new_teaser.jpg" width="800"/>
@@ -225,4 +229,18 @@ python run.py path/to/your_eval_config -p llmit -q auto --max-num-workers 32 --d
 
 # want to run the metric again:
 python run.py path/to/your_eval_config --max-num-workers 32 --debug --reuse 2025xxxx_xxxxxx --mode eval --eval_mode=your_eval_mode
+```
+
+## 3. Bibtex 📝
+
+```
+@misc{yin2025toolvqadatasetmultistepreasoning,
+  title={ToolVQA: A Dataset for Multi-step Reasoning VQA with External Tools}, 
+  author={Shaofeng Yin and Ting Lei and Yang Liu},
+  year={2025},
+  eprint={2508.03284},
+  archivePrefix={arXiv},
+  primaryClass={cs.AI},
+  url={https://arxiv.org/abs/2508.03284}, 
+}
 ```
