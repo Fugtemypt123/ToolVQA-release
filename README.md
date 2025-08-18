@@ -173,7 +173,7 @@ xtuner convert merge path/to/models--meta-llama--Meta-Llama-3-8B-Instruct path/t
 python convert_xtuner_weights_to_hf.py --text_model_id path/to/xtuner_model/llm_merge --vision_model_id path/to/models--openai--clip-vit-large-patch14-336 --projector_weight path/to/xtuner_model/projector/model.safetensors --save_path path/to/xtuner_model/llava_finetune
 ```
 
-You can also download a fine-tuned checkpoint of LLaVA [here](TODO!!!).
+You can also download a fine-tuned checkpoint of LLaVA [here](https://huggingface.co/lttt/llava-ft-4000/tree/main).
 
 In the following section, you should change `path/to/models` to your fine-tuned model path.
 
