@@ -1,6 +1,5 @@
 __pycache__/
 ckpt/
-datasets
 _datasets
 data/
 human_annotation/
